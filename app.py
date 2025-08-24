@@ -2,13 +2,15 @@ import streamlit as st
 import requests
 
 # 🔑 OpenWeather API 키 입력
-API_KEY ="3231c90d13ace8e403a9459ea9a92236"
+API_KEY = "3231c90d13ace8e403a9459ea9a92236"
+
 # ----------------------------
 # 좌표 변환 (주소 → 위도/경도)
 # ----------------------------
 def get_coordinates(address):
     url = f"https://nominatim.openstreetmap.org/search?format=json&q={address}"
-    response = requests.get(url).json()
+    headers = {"User-Agent": "streamlit-app"}  # ✅ User-Agent 추가
+    response = requests.get(url, headers=headers).json()
     if response:
         lat = float(response[0]["lat"])
         lon = float(response[0]["lon"])
@@ -88,6 +90,8 @@ if st.button("조회하기"):
                 st.write(f"🌬️ 바람: {weather['wind']} m/s")
                 st.write(f"🌧️ 강수량(최근 1시간): {weather['rain']} mm")
 
-                score, level = get_fire_risk_score(weather["temp"], weather["humidity"], weather["rain"], weather["wind"])
+                score, level = get_fire_risk_score(
+                    weather["temp"], weather["humidity"], weather["rain"], weather["wind"]
+                )
                 st.warning(f"🔥 산불 위험도: {score}% → {level}")
                 st.progress(score / 100)
